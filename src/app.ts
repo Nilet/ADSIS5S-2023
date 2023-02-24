@@ -15,9 +15,13 @@ class App {
     }
 
     public middleware(): void {
-        this.express.use(express.json())
-    }
+        this.express.use((req, res, next) => {
+          res.header('Access-Control-Allow-Origin', '*');
+          next();
+        });
 
+        this.express.use(express.json());
+      }
     public routes(): void {
         this.express.use(routes)
     }
