@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "start" : "sucrase-node atividades/index.ts",
+    "start": "sucrase-node atividades/index.ts",
     "dev": "sucrase-node src/server.ts",
     "test": "jest"
   },
