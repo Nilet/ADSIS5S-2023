@@ -3,50 +3,82 @@ import { writeFile, readFile } from 'fs/promises'
 class productService {
     public validate(item: Object) {
         try {
-            let teste = false;
-            if (Array.isArray(item) === true) {
+            let valid = false;
+            if (Array.isArray(item)) {
                 console.log("array")
-                teste = item.every((elemento) => {
-
-                    const schema = { "nome": "Caneta", "qtde": 10, "preco": 7.99, "data_compra": "2023-03-15", "data_entrega": "2023-04-25" };
-                    const keys = Object.keys(elemento);
-                    console.log(keys)
-
-                    return (keys.length === Object.keys(schema).length && JSON.stringify(keys) == JSON.stringify(Object.keys(schema)));
-                })
-                return teste;
+                valid = item.every(this.isValid);
+                if (!valid) {
+                    return 400;
+                }
             }
-            if (!Array.isArray(item) && typeof item === 'object') {
-                const schema = { "nome": "Caneta", "qtde": 10, "preco": 7.99, "data_compra": "2023-03-15", "data_entrega": "2023-04-25" };
-                const keys = Object.keys(item);
-
-                teste = (keys.length === Object.keys(schema).length && JSON.stringify(keys) == JSON.stringify(Object.keys(schema)));
-
-                return teste;
+            if (!Array.isArray(item) && typeof item === "object") {
+                valid = this.isValid(item);
+                if (!valid) {
+                    return 400;
+                }
             }
         }
         catch (e) {
             console.error('error: ', e)
         }
 
-        // const schema = { "nome": "Caneta", "qtde": 10, "preco": 7.99, "data_compra": "2023-03-15", "data_entrega": "2023-04-25" };
-        // const keys = Object.keys(item);
-
-        // console.log(keys.length === Object.keys(schema).length && JSON.stringify(keys) == JSON.stringify(Object.keys(schema)));
-        // return (keys.length === Object.keys(schema).length && JSON.stringify(keys) == JSON.stringify(Object.keys(schema)));
-    }
-
-    public static writeJson(toWrite: Object) {
         try {
-            writeFile('products.json', JSON.stringify(toWrite, null, 2))
-            return "Done"
+            this.writeJson(item)
+            return 201;
         } catch (e) {
-            return "Failed"
+            return 500;
         }
     }
 
+    private isValid(item: Object) {
+        const schema = { "nome": "Caneta", "qtde": 10, "preco": 7.99, "data_compra": "2023-03-15", "data_entrega": "2023-04-25" };
+        const keys = Object.keys(item);
 
+        const returnValue = (keys.length === Object.keys(schema).length && JSON.stringify(keys) == JSON.stringify(Object.keys(schema)));
 
+        return returnValue;
+    }
+
+    private writeJson(toWrite: Object) {
+        writeFile('products.json', JSON.stringify(toWrite, null, 2))
+    }
+
+    private async getProducts() {
+        const products = await readFile('products.json', 'utf8');
+
+        return JSON.parse(products);
+    }
+
+    public async getStock() {
+        const products = await this.getProducts();
+
+        let stock: Object;
+
+        if (Array.isArray(products)) {
+            stock = products.map(produto => {
+                let item = {
+                    nome: produto.nome,
+                    qtde: produto.qtde,
+                    preco: produto.preco,
+                    valor_estoque: produto.qtde * produto.preco
+                }
+                return item
+            })
+            return stock;
+        }
+        if (!Array.isArray(products) && typeof products === "object") {
+            const stock = {
+                nome: products.nome,
+                qtde: products.qtde,
+                preco: products.preco,
+                valor_estoque: products.qtde * products.preco
+
+            }
+
+            return stock
+        }
+
+    }
 }
 export default new productService();
 

@@ -11,5 +11,6 @@ routes.get('/health-check', healthCheckController.check)
 routes.get('/users', userController.getNome)
 routes.get('/users/:nome', userController.getUserId)
 routes.post('/products', productController.postProduct)
+routes.get('/products-stock', productController.getProduct)
 
 export default routes
