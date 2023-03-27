@@ -5,16 +5,15 @@ class productService {
         try {
             let valid = false;
             if (Array.isArray(item)) {
-                console.log("array")
                 valid = item.every(this.isValid);
                 if (!valid) {
-                    return 400;
+                    return "BodyError";
                 }
             }
             if (!Array.isArray(item) && typeof item === "object") {
                 valid = this.isValid(item);
                 if (!valid) {
-                    return 400;
+                    return "BodyError";
                 }
             }
         }
@@ -24,9 +23,10 @@ class productService {
 
         try {
             this.writeJson(item)
-            return 201;
+            return "Done";
         } catch (e) {
-            return 500;
+            console.error("Error: " + e);
+            return "CreatingError";
         }
     }
 

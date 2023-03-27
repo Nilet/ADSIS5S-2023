@@ -1,5 +1,6 @@
 import { writeFile, readFile } from 'fs/promises'
 
+
 const alunosArr = [
     { 
         nome: "Chris",
